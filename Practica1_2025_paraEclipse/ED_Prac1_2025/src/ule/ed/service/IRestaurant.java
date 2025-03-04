@@ -13,7 +13,7 @@ public interface IRestaurant {
 	//Devuelve el número de niños que hay en el restaurante ocupando alguna mesa
 	public int getNumberOfChildren();
 			
-         //Devuelve el número de personas que hay en el restaurante ocupando alguna mesa
+	// Devuelve el número de personas que todavía podrían ocupar mesa según el aforo 
 	public int getNumberOfPeople();
 		
 	// Devuelve el número de clientes totales que hay en el restaurante 

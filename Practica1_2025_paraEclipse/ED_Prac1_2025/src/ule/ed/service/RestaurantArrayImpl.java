@@ -62,14 +62,7 @@ public class RestaurantArrayImpl implements IRestaurant {
 
 	@Override
 	public int getNumberOfPeople() {
-		/*
-		int contadorPeople=0;
-		for(int i=0;i<this.nTables;i++){
-			
-			contadorPeople+=tables[i].get;
-		}
-		*/
-		return this.nClients;
+		return this.maxCapacity-this.nClients;
 	}
 
 
@@ -122,6 +115,11 @@ public class RestaurantArrayImpl implements IRestaurant {
 	@Override
 	public List<Integer> getNumbersOfEmptyTables() {
 		List<Integer> lista = new ArrayList<>();
+	    for (int i = 0; i < this.tables.length; i++) {
+	        if (this.tables[i] == null) {
+	            lista.add(i + 1);
+	        }
+	    }
 		
 		return lista;
 	}
