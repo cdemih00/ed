@@ -34,28 +34,27 @@ public ArrayList<Dish> getOrder(){
 }
 
 public void addDishToTable(String name, double price, int count) {
-	Dish element = new Dish(name, price);
-	boolean encontrado = false;
-	
-	if(this.order.isEmpty()) {
-		this.order.add(element);
-		this.order.get(0).setCount(count);
-		this.order.get(0).setPrice(price);
-		this.order.get(0).setName(name);
-	}else {
-		for(int i = 0; i < this.order.size(); i++) {
-			if(this.order.get(i) == element) {
-				encontrado = true;
-				this.order.get(i).setCount(this.order.get(i).getCount()+1);
-			}
-		}
-		if(!encontrado) {
-			this.order.add(element);
-			this.order.get(this.order.size()-1).setCount(count);
-			this.order.get(this.order.size()-1).setPrice(price);
-			this.order.get(this.order.size()-1).setName(name);
-		}
-	}
+    Dish element = new Dish(name, price);
+    boolean encontrado = false;
+
+    if (this.order.isEmpty()) {
+        this.order.add(element);
+        this.order.get(0).setCount(count);
+    } else {
+        for (int i = 0; i < this.order.size(); i++) {
+            // Comparar por nombre Y precio
+            if (this.order.get(i).getName().equals(element.getName()) &&
+                Double.compare(this.order.get(i).getPrice(), element.getPrice()) == 0) {
+                encontrado = true;
+                this.order.get(i).setCount(this.order.get(i).getCount() + count);
+                break;
+            }
+        }
+        if (!encontrado) {
+            this.order.add(element);
+            this.order.get(this.order.size() - 1).setCount(count);
+        }
+    }
 }
  
  @Override

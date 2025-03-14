@@ -40,7 +40,7 @@ public class RestaurantArrayImpl implements IRestaurant {
 	}
 
 
-
+	
 	@Override
 	public int getMaxCapacity() {
 		return this.maxCapacity;
@@ -62,17 +62,18 @@ public class RestaurantArrayImpl implements IRestaurant {
 	}
 
 
-
+	//Devuelve el número de personas que hay en el restaurante ocupando alguna mesa
 	@Override
 	public int getNumberOfPeople() {
-		return this.maxCapacity-this.nClients;
+		return this.nClients;
 	}
 
 
-
+	// Devuelve el número de personas que todavía podrían ocupar mesa según el aforo 
 	@Override
 	public int getActualCapacity() {
-		return this.nClients;
+		
+		return this.maxCapacity-this.nClients;
 	}
 
 
@@ -104,7 +105,7 @@ public class RestaurantArrayImpl implements IRestaurant {
 		int contador=0;
 		for(int i=0;i<this.nTables;i++){
 			
-			if(tables[i].getNChildren()!=0) {
+			if (tables[i] != null && tables[i].getNChildren() != 0) {
 				contador++;
 			}
 			
@@ -131,7 +132,9 @@ public class RestaurantArrayImpl implements IRestaurant {
 
 	@Override
 	public Service getService(int ntable) {
-		
+		if (ntable < 1 || ntable > this.nTables) {
+	        return null; 
+	    }
 		return this.tables[ntable-1];
 	}
 
@@ -139,7 +142,15 @@ public class RestaurantArrayImpl implements IRestaurant {
 
 	@Override
 	public void addDishToTable(int nTable, String name, double price, int count) {
-		this.tables[nTable-1].addDishToTable(name, price, count);
+		// Verificar si el número de mesa es válido y si la mesa está ocupada
+	    if (nTable >= 1 && nTable <= this.nTables && this.tables[nTable - 1] != null) {
+	        // Verificar que el restaurante no exceda su capacidad máxima
+	        if (this.nClients + count <= this.maxCapacity) {
+	            // Añadir el plato a la mesa
+	            this.tables[nTable - 1].addDishToTable(name, price, count);
+	            this.nClients += count; // Actualizar el número de clientes
+	        }
+	    }
 	
 	}
 
@@ -147,7 +158,12 @@ public class RestaurantArrayImpl implements IRestaurant {
 
 	@Override
 	public double getFinalPrice(int ntable) {
-		return this.tables[ntable-1].getTotalService();
+		if (ntable < 1 || ntable > this.nTables || this.tables[ntable - 1] == null) {
+	        return 0.0; // O podrías lanzar una excepción o manejar el caso de otra manera
+	    }
+	    double precio = this.tables[ntable - 1].getTotalService();
+	    double preciofinal = precio - precio * this.discount / 100;
+	    return preciofinal;
 		
 	}
 
@@ -155,14 +171,14 @@ public class RestaurantArrayImpl implements IRestaurant {
 
 	@Override
 	public double getFinalPriceRestaurant() {
-		double precio=0;
-		for(int i=0;i<this.tables.length;i++) {
-			if(this.tables[i]!=null) {
-				precio+=this.tables[i].getTotalService();
-			}
-			
-		}
-		return precio;
+		double precioTotal = 0.0;
+	    for (int i = 0; i < this.nTables; i++) {
+	        if (this.tables[i] != null) { 
+	            precioTotal += this.tables[i].getTotalService();
+	        }
+	    }
+	    double preciofinal = precioTotal - precioTotal * this.discount / 100;
+	    return preciofinal;
     }
 
 
@@ -183,7 +199,7 @@ public class RestaurantArrayImpl implements IRestaurant {
 	@Override
 	public int occupyTable(int nPeople, int nChildren) {
 
-		if (this.maxCapacity < this.nClients + nPeople + nChildren) {
+		if (this.maxCapacity < this.nClients + nPeople) {
 	        return -1; // No hay suficiente capacidad
 	    }
 
@@ -193,7 +209,7 @@ public class RestaurantArrayImpl implements IRestaurant {
 	    while (i < this.nTables && !encontrado) {
 	        if (this.tables[i] == null) {
 	            this.tables[i] = new Service(nPeople, nChildren); // Asigna el servicio a la mesa
-	            this.nClients += nPeople + nChildren; // Actualiza la cantidad de clientes
+	            this.nClients += nPeople; // Actualiza la cantidad de clientes
 	            encontrado = true;
 	            return i + 1; // Retorna el número de mesa (1-based index)
 	        }
@@ -206,8 +222,11 @@ public class RestaurantArrayImpl implements IRestaurant {
 	@Override
 	public boolean occupyTable(int nTable, int nPeople, int nChildren) {
 		
+		if (nTable < 1 || nTable > this.nTables) {
+	        return false; // El número de mesa no es válido
+	    }
 		
-		if (this.maxCapacity < this.nClients + nPeople + nChildren) {
+		if (this.maxCapacity < this.nClients + nPeople) {
 	        return false;
 	    }
 	    if (this.tables[nTable - 1] != null) { 
@@ -215,7 +234,7 @@ public class RestaurantArrayImpl implements IRestaurant {
 	    }
 	    
 	    this.tables[nTable - 1] = new Service(nPeople, nChildren);
-	    this.nClients += nPeople + nChildren;
+	    this.nClients += nPeople;
 	    
 	    return true;
 	    
